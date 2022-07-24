@@ -1,0 +1,65 @@
+run:
+  concurrency: 2
+  deadline: 5m
+
+linters:
+  disable-all: true
+  enable:
+    - asciicheck
+    - bodyclose
+    - cyclop
+    - deadcode
+    - depguard
+    - dogsled
+    - durationcheck
+    - errcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - exportloopref
+    - gochecknoglobals
+    - gochecknoinits
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - goerr113
+    - gofmt
+    - gofumpt
+    - goimports
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - importas
+    - ineffassign
+    - lll
+    - misspell
+    - nakedret
+    - nestif
+    - noctx
+    - nolintlint
+    - prealloc
+    - revive
+    - rowserrcheck
+    - sqlclosecheck
+    - sqlclosecheck
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+    - wastedassign
+    - whitespace
+    - wrapcheck
+
+issues:
+  exclude-use-default: false
+  exclude:
+    - "G404: Use of weak random number generator"
+    - "do not define dynamic errors, use wrapped static errors instead"

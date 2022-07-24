@@ -1,0 +1,23 @@
+input[type="datetime-local"] {
+    text-align: center;
+}
+
+input[type="submit"] {
+    width: 100%;
+}
+
+main.container {
+    width: 40%;
+}
+
+td {
+    text-align: center;
+}
+
+span.time {
+    font-size: 5em;
+}
+
+span.text {
+    font-size: 0.75em;
+}

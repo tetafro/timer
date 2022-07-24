@@ -1,0 +1,17 @@
+{{ define "main" }}
+<table>
+    <tr>
+        <td><span class="time" id="days">00</span></td>
+        <td><span class="time" id="hours">00</span></td>
+        <td><span class="time" id="minutes">00</span></td>
+        <td><span class="time" id="seconds">00</span></td>
+    </tr>
+    <tr>
+        <td><span class="text">days</span></td>
+        <td><span class="text">hours</span></td>
+        <td><span class="text">minutes</span></td>
+        <td><span class="text">seconds</span></td>
+    </tr>
+</table>
+<p hidden id="deadline">{{ .Deadline }}</p>
+{{ end }}

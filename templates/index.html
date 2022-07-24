@@ -1,0 +1,8 @@
+{{ define "main" }}
+<h1 align="center">Create timer</h1>
+<form action="/timer" method="post">
+    <input type="datetime-local" id="time" name="time">
+    <input type="hidden" id="timezone" name="timezone">
+    <input type="submit" value="Start">
+</form>
+{{ end }}

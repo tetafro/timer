@@ -1,0 +1,6 @@
+/.git/
+/bin/
+/.env.example
+/Dockerfile
+/Makefile
+/README.md
