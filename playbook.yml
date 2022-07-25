@@ -35,4 +35,3 @@
         restart_policy: unless-stopped
         volumes:
           - "{{ dir }}:/app/data"
-        command: -f /data/config.yaml
