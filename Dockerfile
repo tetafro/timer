@@ -27,4 +27,6 @@ RUN apk add --no-cache ca-certificates && \
 
 USER timer
 
+EXPOSE 8080
+
 ENTRYPOINT ["/app/timer"]
