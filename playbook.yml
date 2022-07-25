@@ -20,6 +20,7 @@
       docker_image:
         name: "{{ image }}:{{ tag }}"
         source: pull
+        force_source: true
 
     - name: Remove current container
       docker_container:
