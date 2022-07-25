@@ -6,7 +6,7 @@ RUN apk add --no-cache git gcc musl-dev
 
 COPY . .
 
-RUN go build -o ./bin/timer ./cmd/timer
+RUN go build -o ./bin/timer .
 
 FROM alpine:3.16
 
