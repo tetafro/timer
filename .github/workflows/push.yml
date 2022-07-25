@@ -48,3 +48,33 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/tetafro/timer:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install ansible
+        run: |
+          sudo apt-add-repository -y ppa:ansible/ansible
+          sudo apt update -y
+          sudo apt install -y ansible ansible-lint
+
+      - name: Setup ssh
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 0600 ~/.ssh/id_ed25519
+
+      - name: Deploy new image
+        run: >
+          ansible-playbook
+          --private-key ~/.ssh/id_ed25519
+          --inventory '${{ secrets.SSH_HOST }}:${{ secrets.SSH_PORT }},'
+          --user ${{ secrets.SSH_USER }}
+          ./playbook.yml
