@@ -7,7 +7,7 @@ import (
 
 // Config is the main application config.
 type Config struct {
-	Port         int    `env:"PORT" envDefault:"8000"`
+	Port         int    `env:"PORT" envDefault:"8080"`
 	DataDir      string `env:"DATA_DIR" envDefault:"./data"`
 	TemplatesDir string `env:"TEMPLATES_DIR" envDefault:"./templates"`
 	StaticDir    string `env:"STATIC_DIR" envDefault:"./static"`
