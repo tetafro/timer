@@ -32,24 +32,19 @@ function formatTimer() {
     const hour = 60 * minute;
     const day = 24 * hour;
 
-    if (diff >= day) {
         let days = Math.trunc(diff / day);
         document.getElementById("days").innerText = zeroPadding(days, 2);
         diff -= days * day;
-    }
-    if (diff >= hour) {
+
         let hours = Math.trunc(diff / hour);
         document.getElementById("hours").innerText = zeroPadding(hours, 2);
         diff -= hours * hour;
-    }
-    if (diff >= minute) {
+
         let minutes = Math.trunc(diff / minute);
         document.getElementById("minutes").innerText = zeroPadding(minutes, 2);
         diff -= minutes * minute;
-    }
-    if (diff >= 0) {
+
         document.getElementById("seconds").innerText = zeroPadding(diff, 2);
-    }
 }
 
 function getCurrentTimezone() {
