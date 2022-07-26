@@ -21,3 +21,7 @@ span.time {
 span.text {
     font-size: 0.75em;
 }
+
+.alert {
+    color: lightcoral !important;
+}

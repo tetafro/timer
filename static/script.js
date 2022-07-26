@@ -25,6 +25,8 @@ function formatTimer() {
         document.getElementById("hours").innerText = "00";
         document.getElementById("minutes").innerText = "00";
         document.getElementById("seconds").innerText = "00";
+        document.getElementById("label-seconds").classList.add("alert");
+        document.getElementById("seconds").classList.add("alert");
         return;
     }
 
@@ -32,19 +34,19 @@ function formatTimer() {
     const hour = 60 * minute;
     const day = 24 * hour;
 
-        let days = Math.trunc(diff / day);
-        document.getElementById("days").innerText = zeroPadding(days, 2);
-        diff -= days * day;
+    let days = Math.trunc(diff / day);
+    document.getElementById("days").innerText = zeroPadding(days, 2);
+    diff -= days * day;
 
-        let hours = Math.trunc(diff / hour);
-        document.getElementById("hours").innerText = zeroPadding(hours, 2);
-        diff -= hours * hour;
+    let hours = Math.trunc(diff / hour);
+    document.getElementById("hours").innerText = zeroPadding(hours, 2);
+    diff -= hours * hour;
 
-        let minutes = Math.trunc(diff / minute);
-        document.getElementById("minutes").innerText = zeroPadding(minutes, 2);
-        diff -= minutes * minute;
+    let minutes = Math.trunc(diff / minute);
+    document.getElementById("minutes").innerText = zeroPadding(minutes, 2);
+    diff -= minutes * minute;
 
-        document.getElementById("seconds").innerText = zeroPadding(diff, 2);
+    document.getElementById("seconds").innerText = zeroPadding(diff, 2);
 }
 
 function getCurrentTimezone() {
