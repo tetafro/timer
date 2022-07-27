@@ -27,6 +27,7 @@ function formatTimer() {
         document.getElementById("seconds").innerText = "00";
         document.getElementById("label-seconds").classList.add("alert");
         document.getElementById("seconds").classList.add("alert");
+        document.getElementById("timeout").hidden = false;
         return;
     }
 

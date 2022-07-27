@@ -25,3 +25,7 @@ span.text {
 .alert {
     color: lightcoral !important;
 }
+
+p.alert {
+    text-align: center;
+}
