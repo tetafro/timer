@@ -40,7 +40,12 @@ func run() error {
 		return fmt.Errorf("Failed to read config: %v", err)
 	}
 
-	db, err := badger.Open(badger.DefaultOptions(conf.DataDir).WithLogger(nil))
+	opts := badger.DefaultOptions(conf.DataDir).WithLogger(nil)
+	if conf.MemoryStorage {
+		opts = opts.WithInMemory(true)
+		log.Print("Using in-memory storage")
+	}
+	db, err := badger.Open(opts)
 	if err != nil {
 		return fmt.Errorf("Failed to init database: %v", err)
 	}
