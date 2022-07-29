@@ -1,13 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
 	"path/filepath"
-	"strconv"
 	"text/template"
 	"time"
 
@@ -21,6 +21,12 @@ const (
 	// timeLayout is a layout for parsing time from client.
 	timeLayout = "2006-01-02T15:04 -07:00"
 )
+
+// Timer represents a named point in time.
+type Timer struct {
+	Name     string `json:"name"`
+	Deadline int64  `json:"deadline"`
+}
 
 // NewServer initializes new HTTP server with its handlers.
 func NewServer(
@@ -75,7 +81,7 @@ func GetTimerHandler(db *badger.DB, tpl *template.Template) http.HandlerFunc {
 		id := chi.URLParam(r, "id")
 
 		// Get timer from db
-		var ts int
+		var timer Timer
 		err := db.View(func(txn *badger.Txn) error {
 			item, err := txn.Get([]byte(id))
 			if err != nil {
@@ -85,9 +91,8 @@ func GetTimerHandler(db *badger.DB, tpl *template.Template) http.HandlerFunc {
 			if err != nil {
 				return fmt.Errorf("read value: %w", err)
 			}
-			ts, err = strconv.Atoi(string(val))
-			if err != nil {
-				return fmt.Errorf("convert value to number: %w", err)
+			if err := json.Unmarshal(val, &timer); err != nil {
+				return fmt.Errorf("unmarshal db data: %w", err)
 			}
 			return nil
 		})
@@ -101,13 +106,8 @@ func GetTimerHandler(db *badger.DB, tpl *template.Template) http.HandlerFunc {
 			return
 		}
 
-		// Render template
-		data := struct {
-			Deadline string
-		}{
-			Deadline: strconv.Itoa(ts),
-		}
-		tpl.Execute(w, data) // nolint: errcheck,gosec
+		// Render page
+		tpl.Execute(w, timer) // nolint: errcheck,gosec
 	}
 }
 
@@ -124,12 +124,21 @@ func CreateTimerHandler(db *badger.DB) http.HandlerFunc {
 			badRequest(w)
 			return
 		}
-		ts := strconv.Itoa(int(t.Unix()))
+		timer := Timer{
+			Name:     r.FormValue("name"),
+			Deadline: t.Unix(),
+		}
 
 		// Save timer to db
 		id := generateID()
+		data, err := json.Marshal(timer)
+		if err != nil {
+			log.Printf("Failed to marshal db data: %v", err)
+			internalServerError(w)
+			return
+		}
 		err = db.Update(func(txn *badger.Txn) error {
-			return txn.Set(id, []byte(ts)) // nolint: wrapcheck
+			return txn.Set(id, data) // nolint: wrapcheck
 		})
 		if err != nil {
 			log.Printf("Failed to save timer in db: %v", err)
