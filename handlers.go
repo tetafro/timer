@@ -126,7 +126,7 @@ func CreateTimerHandler(db *badger.DB) http.HandlerFunc {
 		}
 		ts := strconv.Itoa(int(t.Unix()))
 
-		// Seave timer to db
+		// Save timer to db
 		id := generateID()
 		err = db.Update(func(txn *badger.Txn) error {
 			return txn.Set(id, []byte(ts)) // nolint: wrapcheck
