@@ -2,11 +2,12 @@ document.addEventListener('DOMContentLoaded', function () {
     if (window.location.pathname == "/") {
         setCurrentTime();
     } else if (window.location.pathname.startsWith("/timer")) {
-        formatTimer();
-        setInterval(formatTimer, 1000);
+        setTimer();
+        setInterval(setTimer, 1000);
     }
 });
 
+// setCurrentTime set current time and timezone inputs on the main page.
 function setCurrentTime() {
     let now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -15,7 +16,8 @@ function setCurrentTime() {
     document.getElementById("timezone").value = getCurrentTimezone();
 }
 
-function formatTimer() {
+// setTimer sets time to deadline on the timer page.
+function setTimer() {
     let deadline = parseInt(document.getElementById("deadline").innerText);
     let now = Math.trunc((new Date()) / 1000);
     let diff = deadline - now;
@@ -50,7 +52,9 @@ function formatTimer() {
     document.getElementById("seconds").innerText = zeroPadding(diff, 2);
 }
 
+// getCurrentTimezone returns current timezone in "+00:00" format.
 function getCurrentTimezone() {
+    // Get offset in minutes
     let offset = -1 * (new Date()).getTimezoneOffset();
 
     let sign = "+";
@@ -59,6 +63,7 @@ function getCurrentTimezone() {
         offset *= -1;
     }
 
+    // Offset in hours
     if (offset % 60 == 0) {
         offset /= 60;
         if (offset < 10) {
@@ -67,21 +72,15 @@ function getCurrentTimezone() {
         return sign + offset.toString() + ":00";
     }
 
+    // Offset in hours and minutes
     let minutes = offset % 60;
-    let hours = (offset - minutes) / 60;
-    if (hours < 10) {
-        hours = "0" + hours.toString();
-    } else {
-        hours = hours.toString();
-    }
-    if (minutes < 10) {
-        minutes = "0" + minutes.toString();
-    } else {
-        minutes = minutes.toString();
-    }
-    return sign + hours + ":" + minutes;
+    let hr = zeroPadding((offset - minutes) / 60, 2);
+    let min = zeroPadding(minutes, 2);
+
+    return sign + hr + ":" + min;
 }
 
+// zeroPadding adds leading zeros to the input value.
 function zeroPadding(n, len) {
     let s = n.toString();
     for (let i = 0; i < (len - s.length); i++) {
