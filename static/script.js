@@ -1,6 +1,21 @@
+// Page init and timer updates.
 document.addEventListener('DOMContentLoaded', function () {
     if (window.location.pathname == "/") {
         setCurrentTime();
+
+        // Timer buttons.
+        document.getElementById("plus10m").addEventListener("click", () => {
+            addTime(10, "minute");
+        });
+        document.getElementById("plus30m").addEventListener("click", () => {
+            addTime(30, "minute");
+        });
+        document.getElementById("plus1h").addEventListener("click", () => {
+            addTime(1, "hour");
+        });
+        document.getElementById("plus1d").addEventListener("click", () => {
+            addTime(1, "day");
+        });
     } else if (window.location.pathname.startsWith("/timer")) {
         setTimer();
         setInterval(setTimer, 1000);
@@ -9,10 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // setCurrentTime set current time and timezone inputs on the main page.
 function setCurrentTime() {
-    let now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-
-    document.getElementById("time").value = now.toISOString().substring(0, 16);
+    document.getElementById("time").value = timeToString(new Date());
     document.getElementById("timezone").value = getCurrentTimezone();
 }
 
@@ -52,6 +64,29 @@ function setTimer() {
     document.getElementById("seconds").innerText = zeroPadding(diff, 2);
 }
 
+function addTime(duration, unit) {
+    let timeInput = document.getElementById("time");
+    let timezone = document.getElementById("timezone").value;
+    let ts = Date.parse(timeInput.value+timezone);
+
+    var time;
+    switch (unit) {
+        case "minute":
+            time = new Date(ts + duration * 60 * 1000);
+            break;
+        case "hour":
+            time = new Date(ts + duration * 60 * 60 * 1000);
+            break;
+        case "day":
+            time = new Date(ts + duration * 24 * 60 * 60 * 1000);
+            break;
+        default:
+            return;
+    }
+
+    timeInput.value = timeToString(time);
+}
+
 // getCurrentTimezone returns current timezone in "+00:00" format.
 function getCurrentTimezone() {
     // Get offset in minutes
@@ -78,6 +113,13 @@ function getCurrentTimezone() {
     let min = zeroPadding(minutes, 2);
 
     return sign + hr + ":" + min;
+}
+
+// timeToString converts input time to a string keeping it in the same
+// timezone, but not including the timezone itself.
+function timeToString(t) {
+    t.setMinutes(t.getMinutes() - t.getTimezoneOffset());
+    return t.toISOString().substring(0, 16);
 }
 
 // zeroPadding adds leading zeros to the input value.
