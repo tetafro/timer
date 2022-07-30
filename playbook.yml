@@ -9,12 +9,23 @@
     tag: latest
     container: timer
     dir: "~/timer"
+    datafile: "data.db"
   tasks:
     - name: Create directory for docker volume
       file:
         path: "{{ dir }}"
         state: directory
-        mode: 0777
+        mode: 0700
+
+    - name: Create directory for docker volume
+      become: true
+      become_flags: '-E'
+      file:
+        path: "{{ dir }}/{{ datafile }}"
+        state: touch
+        owner: 5000 # id from Dockerfile
+        group: 5000 # id from Dockerfile
+        mode: 0600
 
     - name: Pull latest image
       docker_image:
@@ -36,4 +47,4 @@
         networks:
           - name: internal
         volumes:
-          - "{{ dir }}:/app/data"
+          - "{{ dir }}/{{ datafile }}:/app/data.db"
