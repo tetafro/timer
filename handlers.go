@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/httprate"
 )
 
 const (
@@ -32,6 +33,8 @@ func NewServer(
 	port int,
 	tplDir string,
 	staticDir string,
+	reqlimCount int,
+	reqlimWindow time.Duration,
 ) (*http.Server, error) {
 	// Parse templates
 	indexTpl, err := template.ParseFiles(
@@ -51,6 +54,13 @@ func NewServer(
 
 	// Init main router
 	r := chi.NewRouter()
+
+	// Setup rate limit by ip
+	if reqlimCount > 0 {
+		r.Use(httprate.LimitByIP(reqlimCount, reqlimWindow))
+	}
+
+	// Setup routes
 	r.Get("/", RootHandler(indexTpl))
 	r.Post("/timers", CreateTimerHandler(s))
 	r.Get("/timers/{id}", GetTimerHandler(s, timerTpl))
