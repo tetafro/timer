@@ -39,7 +39,7 @@ func run() error {
 	}
 
 	// Init database
-	db, err := OpenStorage(conf.DataFile)
+	db, err := OpenStorage(conf.DataFile, int64(conf.DataFileMaxSize))
 	if err != nil {
 		return fmt.Errorf("Failed to open database: %v", err)
 	}
