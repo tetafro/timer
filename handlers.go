@@ -52,8 +52,8 @@ func NewServer(
 	// Init main router
 	r := chi.NewRouter()
 	r.Get("/", RootHandler(indexTpl))
-	r.Post("/timer", CreateTimerHandler(s))
-	r.Get("/timer/{id}", GetTimerHandler(s, timerTpl))
+	r.Post("/timers", CreateTimerHandler(s))
+	r.Get("/timers/{id}", GetTimerHandler(s, timerTpl))
 
 	// Serve static content
 	fileHandler := http.FileServer(http.Dir(staticDir))
@@ -120,7 +120,7 @@ func CreateTimerHandler(st *Storage) http.HandlerFunc {
 
 		// Redirect to timer's page
 		http.Redirect(w, r,
-			"/timer/"+id,
+			"/timers/"+id,
 			http.StatusSeeOther)
 	}
 }
