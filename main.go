@@ -11,8 +11,6 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
-	badger "github.com/dgraph-io/badger/v3"
 )
 
 const shutdownTimeout = 5 * time.Second
@@ -40,16 +38,12 @@ func run() error {
 		return fmt.Errorf("Failed to read config: %v", err)
 	}
 
-	opts := badger.DefaultOptions(conf.DataDir).WithLogger(nil)
-	if conf.MemoryStorage {
-		opts = opts.WithInMemory(true)
-		log.Print("Using in-memory storage")
-	}
-	db, err := badger.Open(opts)
+	// Init database
+	db, err := OpenStorage(conf.DataFile)
 	if err != nil {
-		return fmt.Errorf("Failed to init database: %v", err)
+		return fmt.Errorf("Failed to open database: %v", err)
 	}
-	defer db.Close() // nolint: errcheck
+	defer db.Close()
 
 	srv, err := NewServer(db, conf.Port, conf.TemplatesDir, conf.StaticDir)
 	if err != nil {

@@ -1,17 +1,15 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
 	"path/filepath"
+	"strings"
 	"text/template"
 	"time"
 
-	badger "github.com/dgraph-io/badger/v3"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -30,7 +28,7 @@ type Timer struct {
 
 // NewServer initializes new HTTP server with its handlers.
 func NewServer(
-	db *badger.DB,
+	s *Storage,
 	port int,
 	tplDir string,
 	staticDir string,
@@ -54,8 +52,8 @@ func NewServer(
 	// Init main router
 	r := chi.NewRouter()
 	r.Get("/", RootHandler(indexTpl))
-	r.Post("/timer", CreateTimerHandler(db))
-	r.Get("/timer/{id}", GetTimerHandler(db, timerTpl))
+	r.Post("/timer", CreateTimerHandler(s))
+	r.Get("/timer/{id}", GetTimerHandler(s, timerTpl))
 
 	// Serve static content
 	fileHandler := http.FileServer(http.Dir(staticDir))
@@ -76,90 +74,55 @@ func RootHandler(tpl *template.Template) http.HandlerFunc {
 }
 
 // GetTimerHandler creates HTTP handler for getting timers by id.
-func GetTimerHandler(db *badger.DB, tpl *template.Template) http.HandlerFunc {
+func GetTimerHandler(st *Storage, tpl *template.Template) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
 
-		// Get timer from db
-		var timer Timer
-		err := db.View(func(txn *badger.Txn) error {
-			item, err := txn.Get([]byte(id))
-			if err != nil {
-				return fmt.Errorf("get item: %w", err)
-			}
-			val, err := item.ValueCopy(nil)
-			if err != nil {
-				return fmt.Errorf("read value: %w", err)
-			}
-			if err := json.Unmarshal(val, &timer); err != nil {
-				return fmt.Errorf("unmarshal db data: %w", err)
-			}
-			return nil
-		})
-		if errors.Is(err, badger.ErrKeyNotFound) {
+		t, err := st.GetTimer(id)
+		if errors.Is(err, ErrNotFound) {
 			http.NotFound(w, r)
 			return
 		}
 		if err != nil {
-			log.Printf("Failed to get timer from db %s: %v", id, err)
+			log.Printf("Failed to get timer from storage %s: %v", id, err)
 			internalServerError(w)
 			return
 		}
 
 		// Render page
-		tpl.Execute(w, timer) // nolint: errcheck,gosec
+		tpl.Execute(w, t) // nolint: errcheck,gosec
 	}
 }
 
 // CreateTimerHandler creates HTTP handler for creating new timers.
-func CreateTimerHandler(db *badger.DB) http.HandlerFunc {
+func CreateTimerHandler(st *Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Parse time
 		t, err := parseTime(
-			r.FormValue("time"),
-			r.FormValue("timezone"),
+			strings.TrimSpace(r.FormValue("time")),
+			strings.TrimSpace(r.FormValue("timezone")),
 		)
 		if err != nil {
 			log.Printf("Failed to parse time: %v", err)
 			badRequest(w)
 			return
 		}
-		timer := Timer{
-			Name:     r.FormValue("name"),
-			Deadline: t.Unix(),
-		}
 
-		// Save timer to db
-		id := generateID()
-		data, err := json.Marshal(timer)
-		if err != nil {
-			log.Printf("Failed to marshal db data: %v", err)
-			internalServerError(w)
-			return
-		}
-		err = db.Update(func(txn *badger.Txn) error {
-			return txn.Set(id, data) // nolint: wrapcheck
+		id, err := st.SaveTimer(Timer{
+			Name:     strings.TrimSpace(r.FormValue("name")),
+			Deadline: t.Unix(),
 		})
 		if err != nil {
-			log.Printf("Failed to save timer in db: %v", err)
+			log.Printf("Failed to save timer in storage: %v", err)
 			internalServerError(w)
 			return
 		}
 
 		// Redirect to timer's page
 		http.Redirect(w, r,
-			"/timer/"+string(id),
+			"/timer/"+id,
 			http.StatusSeeOther)
 	}
-}
-
-func generateID() []byte {
-	const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	id := make([]byte, idLength)
-	for i := range id {
-		id[i] = chars[rand.Intn(len(chars))]
-	}
-	return id
 }
 
 func parseTime(t, tz string) (time.Time, error) {

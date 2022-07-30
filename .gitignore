@@ -1,5 +1,5 @@
 /bin/
-/data/
 /tmp/
 /vendor/
 /.env
+/data.db

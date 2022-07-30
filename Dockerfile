@@ -10,7 +10,7 @@ RUN go build -o ./bin/timer .
 
 FROM alpine:3.16
 
-ENV DATA_DIR=/app/data
+ENV DATA_FILE=/app/data/data.db
 ENV TEMPLATES_DIR=/app/templates
 ENV STATIC_DIR=/app/static
 
