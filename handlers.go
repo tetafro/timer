@@ -24,12 +24,6 @@ const (
 	maxNameLength = 100
 )
 
-// Timer represents a named point in time.
-type Timer struct {
-	Name     string `json:"name"`
-	Deadline int64  `json:"deadline"`
-}
-
 // NewServer initializes new HTTP server with its handlers.
 func NewServer(
 	s *Storage,
@@ -39,15 +33,21 @@ func NewServer(
 	reqlimCount int,
 	reqlimWindow time.Duration,
 ) (*http.Server, error) {
+	h := Handler{
+		storage:   s,
+		sanitizer: bluemonday.StrictPolicy(),
+	}
+
 	// Parse templates
-	indexTpl, err := template.ParseFiles(
+	var err error
+	h.templates.index, err = template.ParseFiles(
 		filepath.Join(tplDir, "base.html"),
 		filepath.Join(tplDir, "index.html"),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("parse index template: %w", err)
 	}
-	timerTpl, err := template.ParseFiles(
+	h.templates.timer, err = template.ParseFiles(
 		filepath.Join(tplDir, "base.html"),
 		filepath.Join(tplDir, "timer.html"),
 	)
@@ -64,9 +64,9 @@ func NewServer(
 	}
 
 	// Setup routes
-	r.Get("/", RootHandler(indexTpl))
-	r.Post("/timers", CreateTimerHandler(s))
-	r.Get("/timers/{id}", GetTimerHandler(s, timerTpl))
+	r.Get("/", h.Index)
+	r.Post("/timers", h.CreateTimer)
+	r.Get("/timers/{id}", h.GetTimer)
 
 	// Serve static content
 	fileHandler := http.FileServer(http.Dir(staticDir))
@@ -79,91 +79,101 @@ func NewServer(
 	return srv, nil
 }
 
-// RootHandler creates HTTP handler for the root directory.
-func RootHandler(tpl *template.Template) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		data := struct {
-			MaxNameLength int
-		}{
-			MaxNameLength: maxNameLength,
-		}
-		tpl.Execute(w, data) // nolint: errcheck,gosec
+// Handler provides a set of HTTP handlers for all server routes.
+type Handler struct {
+	storage   *Storage
+	sanitizer *bluemonday.Policy
+	templates struct {
+		index *template.Template
+		timer *template.Template
 	}
 }
 
-// GetTimerHandler creates HTTP handler for getting timers by id.
-func GetTimerHandler(st *Storage, tpl *template.Template) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id := chi.URLParam(r, "id")
-
-		t, err := st.GetTimer(id)
-		if errors.Is(err, ErrNotFound) {
-			http.NotFound(w, r)
-			return
-		}
-		if err != nil {
-			log.Printf("Failed to get timer from storage %s: %v", id, err)
-			internalServerError(w)
-			return
-		}
-
-		// Render page
-		tpl.Execute(w, t) // nolint: errcheck,gosec
-	}
+// Timer represents a named point in time.
+type Timer struct {
+	Name     string `json:"name"`
+	Deadline int64  `json:"deadline"`
 }
 
-// CreateTimerHandler creates HTTP handler for creating new timers.
-func CreateTimerHandler(st *Storage) http.HandlerFunc {
-	// Setup sanitizer
-	policy := bluemonday.StrictPolicy()
+// Index handles HTTP requests for the root directory.
+func (h *Handler) Index(w http.ResponseWriter, r *http.Request) {
+	h.index(w, http.StatusOK, "")
+}
 
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Parse time
-		t, err := parseTime(
-			strings.TrimSpace(r.FormValue("time")),
-			strings.TrimSpace(r.FormValue("timezone")),
-		)
-		if err != nil {
-			log.Printf("Failed to parse time: %v", err)
-			badRequest(w)
-			return
-		}
+// GetTimer handles HTTP requests for getting timers by id.
+func (h *Handler) GetTimer(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
 
-		// Read and sanitize name
-		name := policy.Sanitize(strings.TrimSpace(r.FormValue("name")))
-		if len([]rune(name)) > maxNameLength {
-			log.Printf("Name is too long")
-			badRequest(w)
-			return
-		}
-
-		id, err := st.SaveTimer(Timer{
-			Name:     name,
-			Deadline: t.Unix(),
-		})
-		if err != nil {
-			log.Printf("Failed to save timer in storage: %v", err)
-			internalServerError(w)
-			return
-		}
-
-		// Redirect to timer's page
-		http.Redirect(w, r,
-			"/timers/"+id,
-			http.StatusSeeOther)
+	t, err := h.storage.GetTimer(id)
+	if errors.Is(err, ErrNotFound) {
+		http.NotFound(w, r)
+		return
 	}
+	if err != nil {
+		log.Printf("Failed to get timer from storage %s: %v", id, err)
+		h.internalServerError(w)
+		return
+	}
+
+	// Render page
+	h.templates.timer.Execute(w, t) // nolint: errcheck,gosec
+}
+
+// CreateTimer handles HTTP requests for creating new timers.
+func (h *Handler) CreateTimer(w http.ResponseWriter, r *http.Request) {
+	// Parse time
+	t, err := parseTime(
+		strings.TrimSpace(r.FormValue("time")),
+		strings.TrimSpace(r.FormValue("timezone")),
+	)
+	if err != nil {
+		h.badRequest(w, "Invalid time format")
+		return
+	}
+
+	// Read and sanitize name
+	name := h.sanitizer.Sanitize(strings.TrimSpace(r.FormValue("name")))
+	if len([]rune(name)) > maxNameLength {
+		h.badRequest(w, "Name is too long")
+		return
+	}
+
+	id, err := h.storage.SaveTimer(Timer{
+		Name:     name,
+		Deadline: t.Unix(),
+	})
+	if err != nil {
+		log.Printf("Failed to save timer in storage: %v", err)
+		h.internalServerError(w)
+		return
+	}
+
+	// Redirect to timer's page
+	http.Redirect(w, r,
+		"/timers/"+id,
+		http.StatusSeeOther)
+}
+
+func (h *Handler) index(w http.ResponseWriter, code int, err string) {
+	data := struct {
+		MaxNameLength int
+		Error         string
+	}{
+		MaxNameLength: maxNameLength,
+		Error:         err,
+	}
+	w.WriteHeader(code)
+	h.templates.index.Execute(w, data) // nolint: errcheck,gosec
+}
+
+func (h *Handler) internalServerError(w http.ResponseWriter) {
+	h.index(w, http.StatusInternalServerError, "Internal server error")
+}
+
+func (h *Handler) badRequest(w http.ResponseWriter, msg string) {
+	h.index(w, http.StatusBadRequest, msg)
 }
 
 func parseTime(t, tz string) (time.Time, error) {
 	return time.Parse(timeLayout, fmt.Sprintf("%s %s", t, tz)) // nolint: wrapcheck
-}
-
-func badRequest(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusBadRequest)
-	w.Write([]byte(http.StatusText(http.StatusBadRequest))) // nolint: errcheck,gosec
-}
-
-func internalServerError(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusInternalServerError)
-	w.Write([]byte(http.StatusText(http.StatusInternalServerError))) // nolint: errcheck,gosec
 }
