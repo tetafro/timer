@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/httprate"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 const (
@@ -19,6 +20,8 @@ const (
 	idLength = 8
 	// timeLayout is a layout for parsing time from client.
 	timeLayout = "2006-01-02T15:04 -07:00"
+	// maxNameLength is a maximum number of chars for timer's name.
+	maxNameLength = 100
 )
 
 // Timer represents a named point in time.
@@ -79,7 +82,12 @@ func NewServer(
 // RootHandler creates HTTP handler for the root directory.
 func RootHandler(tpl *template.Template) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tpl.Execute(w, nil) // nolint: errcheck,gosec
+		data := struct {
+			MaxNameLength int
+		}{
+			MaxNameLength: maxNameLength,
+		}
+		tpl.Execute(w, data) // nolint: errcheck,gosec
 	}
 }
 
@@ -106,6 +114,9 @@ func GetTimerHandler(st *Storage, tpl *template.Template) http.HandlerFunc {
 
 // CreateTimerHandler creates HTTP handler for creating new timers.
 func CreateTimerHandler(st *Storage) http.HandlerFunc {
+	// Setup sanitizer
+	policy := bluemonday.StrictPolicy()
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Parse time
 		t, err := parseTime(
@@ -118,8 +129,16 @@ func CreateTimerHandler(st *Storage) http.HandlerFunc {
 			return
 		}
 
+		// Read and sanitize name
+		name := policy.Sanitize(strings.TrimSpace(r.FormValue("name")))
+		if len([]rune(name)) > maxNameLength {
+			log.Printf("Name is too long")
+			badRequest(w)
+			return
+		}
+
 		id, err := st.SaveTimer(Timer{
-			Name:     strings.TrimSpace(r.FormValue("name")),
+			Name:     name,
 			Deadline: t.Unix(),
 		})
 		if err != nil {
