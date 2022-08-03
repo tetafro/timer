@@ -5,4 +5,4 @@
 
 Simple web form for creating timers.
 
-[Live version](https://timers.dkrv.me).
+[Live version](https://timer.dkrv.me).
