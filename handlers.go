@@ -58,9 +58,12 @@ func NewServer(
 	// Init main router
 	r := chi.NewRouter()
 
-	// Setup rate limit by ip
+	// Setup rate limit by ip/endpoint pair
 	if reqlimCount > 0 {
-		r.Use(httprate.LimitByIP(reqlimCount, reqlimWindow))
+		r.Use(httprate.Limit(
+			reqlimCount, reqlimWindow,
+			httprate.WithKeyFuncs(httprate.KeyByIP, httprate.KeyByEndpoint),
+		))
 	}
 
 	// Setup routes
