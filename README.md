@@ -6,3 +6,15 @@
 Simple web form for creating timers.
 
 [Live version](https://timer.dkrv.me).
+
+## Run
+
+Compile and run binary
+```sh
+make build run
+```
+
+Run as a docker container
+```sh
+docker run -d ghcr.io/tetafro/timer
+```
