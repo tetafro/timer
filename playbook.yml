@@ -43,7 +43,7 @@
         name: "{{ container }}"
         image: "{{ image }}:{{ tag }}"
         state: started
-        restart_policy: unless-stopped
+        restart_policy: always
         networks:
           - name: internal
         volumes:
