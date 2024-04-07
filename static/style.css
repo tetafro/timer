@@ -14,13 +14,24 @@ input[type="submit"] {
 main.container {
     width: 40%;
 }
+@media (max-width: 768px) {
+    main.container {
+        width: 100%;
+    }
+}
 
 td {
     text-align: center;
+    padding: 0px;
 }
 
 span.time {
     font-size: 5em;
+}
+@media (max-width: 768px) {
+    span.time {
+        font-size: 3em;
+    }
 }
 
 span.text {
