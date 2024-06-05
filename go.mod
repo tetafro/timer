@@ -1,6 +1,6 @@
 module github.com/tetafro/timer
 
-go 1.18
+go 1.21
 
 require (
 	github.com/boltdb/bolt v1.3.1

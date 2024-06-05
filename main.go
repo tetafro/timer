@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
 	"os/signal"
@@ -23,7 +22,6 @@ func main() {
 
 // nolint: errorlint,stylecheck
 func run() error {
-	rand.Seed(time.Now().UnixNano())
 	log.Print("Starting...")
 
 	ctx, cancel := signal.NotifyContext(

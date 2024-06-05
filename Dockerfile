@@ -1,4 +1,4 @@
-FROM golang:1.18-alpine3.16 AS build
+FROM golang:1.21-alpine3.19 AS build
 
 WORKDIR /build
 
@@ -8,7 +8,7 @@ COPY . .
 
 RUN go build -o ./bin/timer .
 
-FROM alpine:3.16
+FROM alpine:3.19
 
 ENV DATA_FILE=/app/data.db
 ENV TEMPLATES_DIR=/app/templates
