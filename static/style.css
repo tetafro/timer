@@ -20,6 +20,17 @@ main.container {
     }
 }
 
+#timer {
+    width: 550px;
+    margin-left: auto;
+    margin-right: auto;
+}
+@media (max-width: 768px) {
+    #timer {
+        width: 300px;
+    }
+}
+
 td {
     text-align: center;
     padding: 0px;

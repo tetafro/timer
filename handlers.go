@@ -12,7 +12,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/httprate"
-	"github.com/microcosm-cc/bluemonday"
 )
 
 const (
@@ -20,8 +19,6 @@ const (
 	idLength = 8
 	// timeLayout is a layout for parsing time from client.
 	timeLayout = "2006-01-02T15:04 -07:00"
-	// maxNameLength is a maximum number of chars for timer's name.
-	maxNameLength = 100
 )
 
 // NewServer initializes new HTTP server with its handlers.
@@ -33,10 +30,7 @@ func NewServer(
 	reqlimCount int,
 	reqlimWindow time.Duration,
 ) (*http.Server, error) {
-	h := Handler{
-		storage:   s,
-		sanitizer: bluemonday.StrictPolicy(),
-	}
+	h := Handler{storage: s}
 
 	// Parse templates
 	var err error
@@ -87,21 +81,19 @@ func NewServer(
 // Handler provides a set of HTTP handlers for all server routes.
 type Handler struct {
 	storage   *Storage
-	sanitizer *bluemonday.Policy
 	templates struct {
 		index *template.Template
 		timer *template.Template
 	}
 }
 
-// Timer represents a named point in time.
+// Timer represents a point in time.
 type Timer struct {
-	Name     string `json:"name"`
-	Deadline int64  `json:"deadline"`
+	Deadline int64 `json:"deadline"`
 }
 
 // Index handles HTTP requests for the root directory.
-func (h *Handler) Index(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Index(w http.ResponseWriter, _ *http.Request) {
 	h.index(w, http.StatusOK, "")
 }
 
@@ -136,15 +128,7 @@ func (h *Handler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Read and sanitize name
-	name := h.sanitizer.Sanitize(strings.TrimSpace(r.FormValue("name")))
-	if len([]rune(name)) > maxNameLength {
-		h.badRequest(w, "Name is too long")
-		return
-	}
-
 	id, err := h.storage.SaveTimer(Timer{
-		Name:     name,
 		Deadline: t.Unix(),
 	})
 	if err != nil {
@@ -161,11 +145,9 @@ func (h *Handler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) index(w http.ResponseWriter, code int, err string) {
 	data := struct {
-		MaxNameLength int
-		Error         string
+		Error string
 	}{
-		MaxNameLength: maxNameLength,
-		Error:         err,
+		Error: err,
 	}
 	w.WriteHeader(code)
 	h.templates.index.Execute(w, data) //nolint:errcheck,gosec

@@ -1,15 +1,16 @@
 {{ define "main" }}
-<h1>Create timer</h1>
-<form action="/timers" method="post">
-    <input type="text" id="name" name="name" placeholder="Name (optional)" maxlength="{{ .MaxNameLength }}">
-    <input type="datetime-local" id="time" name="time">
-    <input type="hidden" id="timezone" name="timezone">
-    <input type="submit" value="Start">
-    <div class="grid">
-        <button type="button" class="outline" id="plus10m"><small>+10 min</small></button>
-        <button type="button" class="outline" id="plus30m"><small>+30 min</small></button>
-        <button type="button" class="outline" id="plus1h"><small>+1 hour</small></button>
-        <button type="button" class="outline" id="plus1d"><small>+1 day</small></button>
-    </div>
-</form>
+<main class="container">
+    <h1>Create timer</h1>
+    <form action="/timers" method="post">
+        <input type="datetime-local" id="time" name="time">
+        <input type="hidden" id="timezone" name="timezone">
+        <input type="submit" value="Start">
+        <div class="grid">
+            <button type="button" class="outline" id="plus10m"><small>+10 min</small></button>
+            <button type="button" class="outline" id="plus30m"><small>+30 min</small></button>
+            <button type="button" class="outline" id="plus1h"><small>+1 hour</small></button>
+            <button type="button" class="outline" id="plus1d"><small>+1 day</small></button>
+        </div>
+    </form>
+</main>
 {{ end }}
