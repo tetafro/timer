@@ -1,6 +1,6 @@
 run:
   concurrency: 2
-  deadline: 5m
+  timeout: 5m
 
 linters:
   disable-all: true
