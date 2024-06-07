@@ -1,3 +1,4 @@
+// Simple web form for creating timers.
 package main
 
 import (
@@ -20,7 +21,7 @@ func main() {
 	}
 }
 
-// nolint: errorlint,stylecheck
+//nolint:errorlint,stylecheck
 func run() error {
 	log.Print("Starting...")
 

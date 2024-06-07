@@ -43,7 +43,7 @@ func OpenStorage(datafile string, limit int64) (*Storage, error) {
 
 	err = db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(bucketName))
-		return err // nolint: wrapcheck
+		return err //nolint:wrapcheck
 	})
 	if err != nil {
 		return nil, fmt.Errorf("init database bucket: %w", err)
@@ -102,7 +102,7 @@ func (s *Storage) SaveTimer(t Timer) (string, error) {
 
 	id := generateID()
 	err = s.db.Update(func(tx *bolt.Tx) error {
-		return tx.Bucket([]byte(bucketName)).Put([]byte(id), data) // nolint: wrapcheck
+		return tx.Bucket([]byte(bucketName)).Put([]byte(id), data) //nolint:wrapcheck
 	})
 	if err != nil {
 		return "", fmt.Errorf("save timer in database: %w", err)
@@ -124,7 +124,8 @@ func (s *Storage) Close() {
 // watchDBSize sets up a file watcher. When it gets a write event, the database
 // file's size is checked, and if it exceeds the limit, `full` flag is set to
 // prevent any further writes.
-// nolint: cyclop
+//
+//nolint:cyclop
 func (s *Storage) watchDBSize(datafile string) {
 	for {
 		select {

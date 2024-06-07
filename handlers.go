@@ -76,8 +76,10 @@ func NewServer(
 	r.Get("/static/*", http.StripPrefix("/static", fileHandler).ServeHTTP)
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: r,
+		Addr:         fmt.Sprintf(":%d", port),
+		Handler:      r,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 	return srv, nil
 }
@@ -119,7 +121,7 @@ func (h *Handler) GetTimer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Render page
-	h.templates.timer.Execute(w, t) // nolint: errcheck,gosec
+	h.templates.timer.Execute(w, t) //nolint:errcheck,gosec
 }
 
 // CreateTimer handles HTTP requests for creating new timers.
@@ -166,7 +168,7 @@ func (h *Handler) index(w http.ResponseWriter, code int, err string) {
 		Error:         err,
 	}
 	w.WriteHeader(code)
-	h.templates.index.Execute(w, data) // nolint: errcheck,gosec
+	h.templates.index.Execute(w, data) //nolint:errcheck,gosec
 }
 
 func (h *Handler) internalServerError(w http.ResponseWriter) {
@@ -178,5 +180,5 @@ func (h *Handler) badRequest(w http.ResponseWriter, msg string) {
 }
 
 func parseTime(t, tz string) (time.Time, error) {
-	return time.Parse(timeLayout, fmt.Sprintf("%s %s", t, tz)) // nolint: wrapcheck
+	return time.Parse(timeLayout, fmt.Sprintf("%s %s", t, tz)) //nolint:wrapcheck
 }

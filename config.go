@@ -25,7 +25,7 @@ type Config struct {
 func ReadConfig() (Config, error) {
 	var conf Config
 	if err := env.Parse(&conf); err != nil {
-		return Config{}, err // nolint: wrapcheck
+		return Config{}, err //nolint:wrapcheck
 	}
 	return conf, nil
 }
@@ -35,7 +35,6 @@ func ReadConfig() (Config, error) {
 type Size int64
 
 // SizeUnits is a set of available units for `Size` type.
-// nolint: gochecknoglobals
 var SizeUnits = map[string]int64{
 	"B": 1,
 	"K": 1024,
