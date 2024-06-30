@@ -2,17 +2,12 @@ h1 {
     text-align: center;
 }
 
-input[type="text"],
-input[type="datetime-local"] {
+input {
     text-align: center;
 }
 
-input[type="submit"] {
-    width: 100%;
-}
-
 main.container {
-    width: 40%;
+    width: 30%;
 }
 @media (max-width: 768px) {
     main.container {

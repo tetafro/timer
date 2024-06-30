@@ -1,16 +1,26 @@
 {{ define "main" }}
 <main class="container">
     <h1>Create timer</h1>
-    <form action="/timers" method="post">
-        <input type="datetime-local" id="time" name="time">
-        <input type="hidden" id="timezone" name="timezone">
-        <input type="submit" value="Start">
-        <div class="grid">
-            <button type="button" class="outline" id="plus10m"><small>+10 min</small></button>
-            <button type="button" class="outline" id="plus30m"><small>+30 min</small></button>
-            <button type="button" class="outline" id="plus1h"><small>+1 hour</small></button>
-            <button type="button" class="outline" id="plus1d"><small>+1 day</small></button>
-        </div>
-    </form>
+    <article>
+        <form id="form-duration" action="/timers" method="post">
+            <label>Duration</label>
+            <fieldset role="group">
+                <input type="number" name="duration" placeholder="Minutes">
+                <input type="hidden" name="deadline">
+                <input type="submit" value="Start">
+            </fieldset>
+        </form>
+    </article>
+
+    <article>
+        <form id="form-deadline" action="/timers" method="post">
+            <label>Deadline</label>
+            <fieldset role="group">
+                <input type="datetime-local" name="calendar">
+                <input type="hidden" name="deadline">
+                <input type="submit" value="Start">
+            </fieldset>
+        </form>
+    </article>
 </main>
 {{ end }}

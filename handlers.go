@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
-	"strings"
 	"text/template"
 	"time"
 
@@ -14,12 +13,8 @@ import (
 	"github.com/go-chi/httprate"
 )
 
-const (
-	// idLength is a number of chars in timer id.
-	idLength = 8
-	// timeLayout is a layout for parsing time from client.
-	timeLayout = "2006-01-02T15:04 -07:00"
-)
+// idLength is a number of chars in timer id.
+const idLength = 8
 
 // NewServer initializes new HTTP server with its handlers.
 func NewServer(
@@ -118,11 +113,7 @@ func (h *Handler) GetTimer(w http.ResponseWriter, r *http.Request) {
 
 // CreateTimer handles HTTP requests for creating new timers.
 func (h *Handler) CreateTimer(w http.ResponseWriter, r *http.Request) {
-	// Parse time
-	t, err := parseTime(
-		strings.TrimSpace(r.FormValue("time")),
-		strings.TrimSpace(r.FormValue("timezone")),
-	)
+	t, err := time.Parse(time.RFC3339, r.FormValue("deadline"))
 	if err != nil {
 		h.badRequest(w, "Invalid time format")
 		return
@@ -159,8 +150,4 @@ func (h *Handler) internalServerError(w http.ResponseWriter) {
 
 func (h *Handler) badRequest(w http.ResponseWriter, msg string) {
 	h.index(w, http.StatusBadRequest, msg)
-}
-
-func parseTime(t, tz string) (time.Time, error) {
-	return time.Parse(timeLayout, fmt.Sprintf("%s %s", t, tz)) //nolint:wrapcheck
 }
