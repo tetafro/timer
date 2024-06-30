@@ -1,35 +1,35 @@
-h1 {
-    text-align: center;
-}
-
-input {
-    text-align: center;
-}
-
 main.container {
+    width: 100%;
+}
+
+h1, input {
+    text-align: center;
+}
+
+article {
     width: 40%;
+    margin: auto;
 }
 @media (max-width: 768px) {
-    main.container {
-        padding-top: 100px;
+    article {
         width: 100%;
     }
 }
 
-#timer {
-    width: 550px;
-    margin-left: auto;
-    margin-right: auto;
-}
-@media (max-width: 768px) {
-    #timer {
-        width: 100%;
-    }
+table {
+    margin: auto;
+    width: auto;
 }
 
 td {
     text-align: center;
-    padding: 0px;
+    white-space: nowrap;
+    padding: 0px 25px;
+}
+@media (max-width: 768px) {
+    td {
+        padding: 0px 10px;
+    }
 }
 
 span.time {
@@ -47,8 +47,6 @@ span.text {
 
 .alert {
     color: lightcoral !important;
-}
-
-p.alert {
     text-align: center;
+    padding: 10px;
 }

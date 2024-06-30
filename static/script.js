@@ -1,8 +1,6 @@
 // Page init and timer updates.
 document.addEventListener('DOMContentLoaded', function () {
     if (window.location.pathname == "/") {
-        // document.getElementById("timezone").value = getCurrentTimezone();
-
         const formDuration = document.getElementById("form-duration");
         formDuration.addEventListener("submit", function () {
             const inputDuration = formDuration.elements["duration"];
@@ -31,34 +29,34 @@ function setTimer() {
     let now = Math.trunc((new Date()) / 1000);
     let diff = deadline - now;
 
+    const timerParts = [
+        {element: document.getElementById("days"), size: 60*60*24},
+        {element: document.getElementById("hours"), size: 60*60},
+        {element: document.getElementById("minutes"), size: 60},
+        {element: document.getElementById("seconds"), size: 1},
+    ];
+
     if (diff <= 0) {
-        document.getElementById("days").innerText = "00";
-        document.getElementById("hours").innerText = "00";
-        document.getElementById("minutes").innerText = "00";
-        document.getElementById("seconds").innerText = "00";
+        timerParts.forEach((part) => {
+            setText(part.element, "00");
+        });
         document.getElementById("label-seconds").classList.add("alert");
         document.getElementById("seconds").classList.add("alert");
         document.getElementById("timeout").hidden = false;
         return;
     }
 
-    const minute = 60;
-    const hour = 60 * minute;
-    const day = 24 * hour;
+    timerParts.forEach((part) => {
+        const count = Math.trunc(diff / part.size);
+        setText(part.element, zeroPadding(count, 2));
+        diff -= count * part.size;
+    });
+}
 
-    let days = Math.trunc(diff / day);
-    document.getElementById("days").innerText = zeroPadding(days, 2);
-    diff -= days * day;
-
-    let hours = Math.trunc(diff / hour);
-    document.getElementById("hours").innerText = zeroPadding(hours, 2);
-    diff -= hours * hour;
-
-    let minutes = Math.trunc(diff / minute);
-    document.getElementById("minutes").innerText = zeroPadding(minutes, 2);
-    diff -= minutes * minute;
-
-    document.getElementById("seconds").innerText = zeroPadding(diff, 2);
+function setText(element, text) {
+    if (element != null) {
+        element.innerText = text;
+    }
 }
 
 // zeroPadding adds leading zeros to the input value.

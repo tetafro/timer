@@ -85,6 +85,15 @@ type Handler struct {
 // Timer represents a point in time.
 type Timer struct {
 	Deadline int64 `json:"deadline"`
+	Created  int64 `json:"created"`
+}
+
+// TimerPage contains data for the page that shows a timer.
+type TimerPage struct {
+	Deadline    int64
+	WithMinutes bool
+	WithHours   bool
+	WithDays    bool
 }
 
 // Index handles HTTP requests for the root directory.
@@ -107,8 +116,15 @@ func (h *Handler) GetTimer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	data := TimerPage{
+		Deadline:    t.Deadline,
+		WithMinutes: t.Deadline-t.Created >= 60,
+		WithHours:   t.Deadline-t.Created >= 60*60,
+		WithDays:    t.Deadline-t.Created >= 60*60*24,
+	}
+
 	// Render page
-	h.templates.timer.Execute(w, t) //nolint:errcheck,gosec
+	h.templates.timer.Execute(w, data) //nolint:errcheck,gosec
 }
 
 // CreateTimer handles HTTP requests for creating new timers.
@@ -121,6 +137,7 @@ func (h *Handler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 
 	id, err := h.storage.SaveTimer(Timer{
 		Deadline: t.Unix(),
+		Created:  time.Now().Unix(),
 	})
 	if err != nil {
 		log.Printf("Failed to save timer in storage: %v", err)

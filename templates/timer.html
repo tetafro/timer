@@ -1,15 +1,15 @@
 {{ define "main" }}
 <table id="timer">
     <tr>
-        <td><span class="time" id="days">00</span></td>
-        <td><span class="time" id="hours">00</span></td>
-        <td><span class="time" id="minutes">00</span></td>
+        {{ if .WithDays }}<td><span class="time" id="days">00</span></td>{{ end }}
+        {{ if .WithHours }}<td><span class="time" id="hours">00</span></td>{{ end }}
+        {{ if .WithMinutes }}<td><span class="time" id="minutes">00</span></td>{{ end }}
         <td><span class="time" id="seconds">00</span></td>
     </tr>
     <tr>
-        <td><span class="text" id="label-days">days</span></td>
-        <td><span class="text" id="label-hours">hours</span></td>
-        <td><span class="text" id="label-minutes">minutes</span></td>
+        {{ if .WithDays }}<td><span class="text" id="label-days">days</span></td>{{ end }}
+        {{ if .WithHours }}<td><span class="text" id="label-hours">hours</span></td>{{ end }}
+        {{ if .WithMinutes }}<td><span class="text" id="label-minutes">minutes</span></td>{{ end }}
         <td><span class="text" id="label-seconds">seconds</span></td>
     </tr>
 </table>
