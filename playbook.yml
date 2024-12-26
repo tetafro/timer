@@ -44,6 +44,8 @@
         image: "{{ image }}:{{ tag }}"
         state: started
         restart_policy: always
+        env:
+          BASE_PATH: /timer
         networks:
           - name: internal
         volumes:
