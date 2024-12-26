@@ -20,12 +20,13 @@ const idLength = 8
 func NewServer(
 	s *Storage,
 	port int,
+	basePath string,
 	tplDir string,
 	staticDir string,
 	reqlimCount int,
 	reqlimWindow time.Duration,
 ) (*http.Server, error) {
-	h := Handler{storage: s}
+	h := Handler{storage: s, basePath: basePath}
 
 	// Parse templates
 	var err error
@@ -42,6 +43,13 @@ func NewServer(
 	)
 	if err != nil {
 		return nil, fmt.Errorf("parse timer template: %w", err)
+	}
+	h.templates.error, err = template.ParseFiles(
+		filepath.Join(tplDir, "base.html"),
+		filepath.Join(tplDir, "error.html"),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("parse error template: %w", err)
 	}
 
 	// Init main router
@@ -76,9 +84,11 @@ func NewServer(
 // Handler provides a set of HTTP handlers for all server routes.
 type Handler struct {
 	storage   *Storage
+	basePath  string
 	templates struct {
 		index *template.Template
 		timer *template.Template
+		error *template.Template
 	}
 }
 
@@ -88,8 +98,20 @@ type Timer struct {
 	Created  int64 `json:"created"`
 }
 
+// Context is data shared across all templates.
+type Context struct {
+	BasePath string
+}
+
+// ErrorPage contains data for the page that shows an error.
+type ErrorPage struct {
+	Context
+	Error string
+}
+
 // TimerPage contains data for the page that shows a timer.
 type TimerPage struct {
+	Context
 	Deadline    int64
 	WithMinutes bool
 	WithHours   bool
@@ -98,7 +120,9 @@ type TimerPage struct {
 
 // Index handles HTTP requests for the root directory.
 func (h *Handler) Index(w http.ResponseWriter, _ *http.Request) {
-	h.index(w, http.StatusOK, "")
+	data := Context{BasePath: h.basePath}
+	w.WriteHeader(http.StatusOK)
+	h.templates.index.Execute(w, data) //nolint:errcheck,gosec
 }
 
 // GetTimer handles HTTP requests for getting timers by id.
@@ -151,20 +175,20 @@ func (h *Handler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 		http.StatusSeeOther)
 }
 
-func (h *Handler) index(w http.ResponseWriter, code int, err string) {
-	data := struct {
-		Error string
-	}{
-		Error: err,
-	}
-	w.WriteHeader(code)
-	h.templates.index.Execute(w, data) //nolint:errcheck,gosec
-}
-
 func (h *Handler) internalServerError(w http.ResponseWriter) {
-	h.index(w, http.StatusInternalServerError, "Internal server error")
+	data := ErrorPage{
+		Context: Context{BasePath: h.basePath},
+		Error:   "Internal server error",
+	}
+	w.WriteHeader(http.StatusInternalServerError)
+	h.templates.error.Execute(w, data) //nolint:errcheck,gosec
 }
 
 func (h *Handler) badRequest(w http.ResponseWriter, msg string) {
-	h.index(w, http.StatusBadRequest, msg)
+	data := ErrorPage{
+		Context: Context{BasePath: h.basePath},
+		Error:   msg,
+	}
+	w.WriteHeader(http.StatusBadRequest)
+	h.templates.error.Execute(w, data) //nolint:errcheck,gosec
 }

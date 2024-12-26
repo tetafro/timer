@@ -5,7 +5,7 @@
 
 Simple web form for creating timers.
 
-[Live version](https://timer.dkrv.me).
+[Live version](https://dkrv.me/timer).
 
 ## Run
 

@@ -45,8 +45,8 @@ func run() error {
 	defer db.Close()
 
 	// Init http server
-	srv, err := NewServer(db,
-		conf.Port, conf.TemplatesDir, conf.StaticDir,
+	srv, err := NewServer(db, conf.Port,
+		conf.BasePath, conf.TemplatesDir, conf.StaticDir,
 		conf.RequestLimitCount, conf.RequestLimitWindow)
 	if err != nil {
 		return fmt.Errorf("Failed to init server: %v", err)

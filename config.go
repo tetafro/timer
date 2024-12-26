@@ -12,6 +12,7 @@ import (
 
 // Config is the main application config.
 type Config struct {
+	BasePath           string        `env:"BASE_PATH" envDefault:""`
 	Port               int           `env:"PORT" envDefault:"8080"`
 	DataFile           string        `env:"DATA_FILE" envDefault:"./data.db"`
 	DataFileMaxSize    Size          `env:"DATA_FILE_MAX_SIZE" envDefault:"100M"`
