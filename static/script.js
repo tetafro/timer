@@ -1,6 +1,6 @@
 // Page init and timer updates.
 document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.pathname == "/") {
+    if (window.location.pathname == basePath) {
         const formDuration = document.getElementById("form-duration");
         formDuration.addEventListener("submit", function () {
             const inputDuration = formDuration.elements["duration"];
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const deadline = new Date(inputCalendar.value);
             inputDeadline.value = deadline.toISOString();
         });
-    } else if (window.location.pathname.startsWith("/timer")) {
+    } else if (window.location.pathname.startsWith(basePath+"/timer")) {
         setTimer();
         setInterval(setTimer, 1000);
     }
