@@ -45,7 +45,7 @@
         state: started
         restart_policy: always
         env:
-          BASE_PATH: ""
+          BASE_PATH: /
         networks:
           - name: internal
         volumes:

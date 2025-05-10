@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const deadline = new Date(inputCalendar.value);
             inputDeadline.value = deadline.toISOString();
         });
-    } else if (window.location.pathname.startsWith(basePath+"/timer")) {
+    } else if (window.location.pathname.startsWith(basePath+"timer")) {
         setTimer();
         setInterval(setTimer, 1000);
     }
