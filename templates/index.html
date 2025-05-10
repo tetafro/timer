@@ -1,7 +1,7 @@
 {{ define "main" }}
 <h1>Create timer</h1>
 <article>
-    <form id="form-duration" action="{{ .BasePath }}/timers" method="post">
+    <form id="form-duration" action="{{ .BasePath }}timers" method="post">
         <label>Duration</label>
         <fieldset role="group">
             <input type="number" name="duration" placeholder="Minutes">
@@ -12,7 +12,7 @@
 </article>
 
 <article>
-    <form id="form-deadline" action="{{ .BasePath }}/timers" method="post">
+    <form id="form-deadline" action="{{ .BasePath }}timers" method="post">
         <label>Deadline</label>
         <fieldset role="group">
             <input type="datetime-local" name="calendar">
