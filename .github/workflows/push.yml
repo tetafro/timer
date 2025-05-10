@@ -62,7 +62,7 @@ jobs:
         run: |
           sudo apt-add-repository -y ppa:ansible/ansible
           sudo apt update -y
-          sudo apt install -y ansible ansible-lint
+          sudo apt install -y ansible
 
       - name: Setup ssh
         run: |
