@@ -141,6 +141,7 @@ func (h *Handler) GetTimer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := TimerPage{
+		Context:     Context{BasePath: h.basePath},
 		Deadline:    t.Deadline,
 		WithMinutes: t.Deadline-t.Created >= 60,
 		WithHours:   t.Deadline-t.Created >= 60*60,
