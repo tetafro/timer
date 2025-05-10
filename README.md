@@ -5,7 +5,7 @@
 
 Simple web form for creating timers.
 
-[Live version](https://dkrv.me/timer).
+[Live version](https://timer.dkrv.me).
 
 ## Run
 
@@ -17,4 +17,12 @@ make build run
 Run as a docker container
 ```sh
 docker run -d ghcr.io/tetafro/timer
+```
+
+## Deploy
+
+```sh
+SSH_SERVER=164.90.195.10:15222 \
+SSH_USER=tetafro \
+make deploy
 ```
