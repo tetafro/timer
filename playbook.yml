@@ -19,7 +19,7 @@
 
     - name: Create directory for docker volume
       become: true
-      become_flags: '-E'
+      become_flags: "-E"
       file:
         path: "{{ dir }}/{{ datafile }}"
         state: touch
