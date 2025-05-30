@@ -1,5 +1,6 @@
 // Page init and timer updates.
 document.addEventListener('DOMContentLoaded', function () {
+    // Setup forms
     if (window.location.pathname == basePath) {
         const formDuration = document.getElementById("form-duration");
         formDuration.addEventListener("submit", function () {
@@ -21,6 +22,20 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimer();
         setInterval(setTimer, 1000);
     }
+
+    // Setup tabs
+    const tabs = document.querySelectorAll(".tab");
+    const contents = document.querySelectorAll(".tab-content");
+    tabs.forEach((tab, i) => {
+        tab.addEventListener("click", () => {
+            tabs.forEach(t => t.classList.remove("active"));
+            contents.forEach(c => c.classList.remove("active"));
+            tab.classList.add("active");
+            contents[i].classList.add("active");
+        });
+    });
+    // Set first tab active on load
+    tabs[0].click();
 });
 
 // setTimer sets time to deadline on the timer page.

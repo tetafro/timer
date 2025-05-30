@@ -50,3 +50,32 @@ span.text {
     text-align: center;
     padding: 10px;
 }
+
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1em;
+    gap: 1em;
+    flex-wrap: wrap;
+}
+
+.tab {
+    padding: 0.5em 1em;
+    border: none;
+    background: #eee;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.tab.active {
+    background: #ddd;
+    font-weight: bold;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
