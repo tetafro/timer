@@ -7,22 +7,21 @@ linters:
   enable:
     - asciicheck
     - bodyclose
+    - copyloopvar
     - cyclop
     - dogsled
     - durationcheck
+    - err113
     - errcheck
     - errname
     - errorlint
     - exhaustive
-    - exportloopref
-    - exportloopref
     - gochecknoinits
     - gocognit
     - goconst
     - gocritic
     - gocyclo
     - godot
-    - goerr113
     - gofmt
     - gofumpt
     - goimports

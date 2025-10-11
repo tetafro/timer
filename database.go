@@ -102,7 +102,7 @@ func (s *Storage) SaveTimer(t Timer) (string, error) {
 
 	id := generateID()
 	err = s.db.Update(func(tx *bolt.Tx) error {
-		return tx.Bucket([]byte(bucketName)).Put([]byte(id), data) //nolint:wrapcheck
+		return tx.Bucket([]byte(bucketName)).Put([]byte(id), data)
 	})
 	if err != nil {
 		return "", fmt.Errorf("save timer in database: %w", err)
