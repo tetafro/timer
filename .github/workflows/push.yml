@@ -50,7 +50,7 @@ jobs:
           tags: ghcr.io/tetafro/timer:latest
 
   deploy:
-    needs: build
+    needs: [build]
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
