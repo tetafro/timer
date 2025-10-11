@@ -10,7 +10,7 @@
     <article>
         <form id="form-duration" action="{{ .BasePath }}timers" method="post">
             <fieldset role="group">
-                <input type="number" name="duration" placeholder="Minutes">
+                <input type="number" min="1" max="999999999" name="duration" placeholder="Minutes">
                 <input type="hidden" name="deadline">
                 <input type="submit" value="Start">
             </fieldset>

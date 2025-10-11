@@ -156,7 +156,7 @@ func (h *Handler) GetTimer(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) CreateTimer(w http.ResponseWriter, r *http.Request) {
 	t, err := time.Parse(time.RFC3339, r.FormValue("deadline"))
 	if err != nil {
-		h.badRequest(w, "Invalid time format: "+r.FormValue("deadline"))
+		h.badRequest(w, "Invalid time format: '"+r.FormValue("deadline")+"'")
 		return
 	}
 

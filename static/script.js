@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Setup forms
     if (window.location.pathname == basePath) {
+        // By duration
         const formDuration = document.getElementById("form-duration");
         formDuration.addEventListener("submit", function () {
             const inputDuration = formDuration.elements["duration"];
@@ -11,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const deadline = new Date(current.getTime() + seconds * 1000);
             inputDeadline.value = deadline.toISOString();
         });
+        // By deadline
         const formDeadline = document.getElementById("form-deadline");
         formDeadline.addEventListener("submit", function () {
             const inputCalendar = formDeadline.elements["calendar"];
