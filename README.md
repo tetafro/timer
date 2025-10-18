@@ -18,11 +18,3 @@ Run as a docker container
 ```sh
 docker run -d ghcr.io/tetafro/timer
 ```
-
-## Deploy
-
-```sh
-SSH_SERVER=164.90.195.10:15222 \
-SSH_USER=tetafro \
-make deploy
-```
