@@ -8,7 +8,7 @@
     image: ghcr.io/tetafro/timer
     tag: latest
     container: timer
-    dir: "~/timer"
+    dir: "/etc/timer"
     datafile: "data.db"
   tasks:
     - name: Create directory for docker volume
